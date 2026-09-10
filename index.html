@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>พัชรินทร์ เชิงชวน — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Kanit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --abyss:#031725;
+    --deep:#04283f;
+    --sea:#0a4d6e;
+    --tide:#0f7a9e;
+    --neon:#39f5d4;
+    --neon-2:#5fe9ff;
+    --foam:#e7fbff;
+    --foam-dim:#a9d4de;
+    --glow-soft: rgba(57,245,212,0.35);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--abyss);
+    color:var(--foam);
+    font-family:'Kanit',sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  h1,h2,h3,.display{
+    font-family:'Chakra Petch',sans-serif;
+    letter-spacing:0.02em;
+  }
+
+  ::selection{ background:var(--neon); color:var(--abyss); }
+
+  a{ color:inherit; text-decoration:none; }
+
+  /* ---------- fixed ambient ocean backdrop ---------- */
+  .ocean-bg{
+    position:fixed; inset:0; z-index:-3;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% -10%, #0d5f82 0%, transparent 60%),
+      linear-gradient(180deg, var(--abyss) 0%, var(--deep) 45%, #021019 100%);
+  }
+  .ray{
+    position:fixed; top:-10%; z-index:-2;
+    width:2px; height:120vh;
+    background:linear-gradient(180deg, rgba(95,233,255,0.18), transparent 75%);
+    filter:blur(1px);
+    transform-origin:top center;
+  }
+  .ray:nth-child(1){ left:12%; transform:rotate(6deg); }
+  .ray:nth-child(2){ left:34%; transform:rotate(-4deg); width:3px; opacity:.7;}
+  .ray:nth-child(3){ left:58%; transform:rotate(3deg);}
+  .ray:nth-child(4){ left:76%; transform:rotate(-7deg); width:1.5px; opacity:.5;}
+  .ray:nth-child(5){ left:90%; transform:rotate(5deg); opacity:.4;}
+
+  #particles{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px clamp(20px,6vw,64px);
+    backdrop-filter:blur(10px);
+    background:linear-gradient(180deg, rgba(3,23,37,0.75), rgba(3,23,37,0));
+  }
+  .brand{
+    font-family:'Chakra Petch',sans-serif;
+    font-weight:600; font-size:1.05rem;
+    color:var(--foam);
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand-mark{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--neon);
+    box-shadow:0 0 12px 3px var(--glow-soft);
+  }
+  .nav-links{ display:flex; gap:clamp(16px,3vw,36px); font-size:0.92rem; color:var(--foam-dim); }
+  .nav-links a{ position:relative; transition:color .3s ease; }
+  .nav-links a:hover{ color:var(--neon-2); }
+  .nav-links a::after{
+    content:''; position:absolute; left:0; bottom:-6px; width:0; height:1px;
+    background:var(--neon); transition:width .3s ease;
+  }
+  .nav-links a:hover::after{ width:100%; }
+  .nav-toggle{ display:none; }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding:120px 24px 260px;
+    overflow:hidden;
+  }
+  .eyebrow-thai{
+    font-family:'Kanit',sans-serif; font-weight:300; font-size:0.95rem;
+    color:var(--neon-2); opacity:.85; margin-bottom:18px;
+    letter-spacing:0.04em;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem, 7vw, 5.4rem);
+    line-height:1.08;
+    font-weight:700;
+    background:linear-gradient(180deg, #ffffff 10%, var(--neon-2) 55%, var(--neon) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 26px rgba(57,245,212,0.35));
+    max-width:16ch;
+  }
+  .hero .role{
+    margin-top:22px;
+    font-size:clamp(1rem,2vw,1.3rem);
+    color:var(--foam-dim);
+    font-weight:300;
+    max-width:44ch;
+  }
+  .hero .role b{ color:var(--foam); font-weight:500; }
+  .hero-cta{
+    margin-top:44px; display:flex; gap:18px; flex-wrap:wrap; justify-content:center;
+  }
+  .btn{
+    padding:14px 30px; border-radius:999px; font-family:'Chakra Petch',sans-serif;
+    font-size:0.95rem; font-weight:500; cursor:pointer; border:1px solid transparent;
+    transition:transform .35s ease, box-shadow .35s ease, background .35s ease;
+  }
+  .btn-primary{
+    background:linear-gradient(120deg, var(--neon), var(--neon-2));
+    color:#022029;
+    box-shadow:0 0 0 rgba(57,245,212,0);
+  }
+  .btn-primary:hover{ transform:translateY(-3px); box-shadow:0 10px 30px -8px var(--glow-soft); }
+  .btn-ghost{
+    border-color:rgba(167,231,236,0.35); color:var(--foam);
+  }
+  .btn-ghost:hover{ border-color:var(--neon-2); background:rgba(57,245,212,0.08); transform:translateY(-3px); }
+
+  /* waves */
+  .wave-wrap{
+    position:absolute; left:0; right:0; bottom:0; height:340px;
+    pointer-events:none;
+  }
+  .wave-wrap svg{ position:absolute; bottom:0; width:200%; height:100%; }
+  .wave-back{ animation: drift 22s linear infinite; opacity:.55; }
+  .wave-mid{ animation: drift 15s linear infinite reverse; opacity:.75; }
+  .wave-front{ animation: drift 10s linear infinite; }
+  @keyframes drift{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+
+  /* ---------- sections shared ---------- */
+  section{ position:relative; padding:120px clamp(20px,6vw,64px); }
+  .section-inner{ max-width:1120px; margin:0 auto; }
+  .kicker{
+    font-size:0.85rem; color:var(--neon); font-weight:500;
+    font-family:'Chakra Petch',sans-serif; margin-bottom:14px;
+  }
+  .section-title{
+    font-size:clamp(1.9rem,4vw,2.7rem); font-weight:600; color:var(--foam);
+    max-width:20ch; margin-bottom:28px;
+  }
+  .lede{ color:var(--foam-dim); font-size:1.05rem; line-height:1.85; max-width:62ch; }
+
+  /* about */
+  .about-grid{
+    display:grid; grid-template-columns: 1fr 1.15fr; gap:64px; align-items:center;
+  }
+  .about-portrait{
+    position:relative; aspect-ratio:4/5; border-radius:18px;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(57,245,212,0.25), transparent 55%),
+      linear-gradient(160deg, #0a3550, #062338 60%, #041825);
+    border:1px solid rgba(95,233,255,0.25);
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .about-portrait::before{
+    content:'พ'; font-family:'Chakra Petch',sans-serif; font-size:9rem; font-weight:700;
+    color:rgba(57,245,212,0.14);
+  }
+  .about-portrait .ring{
+    position:absolute; width:70%; aspect-ratio:1; border-radius:50%;
+    border:1px solid rgba(57,245,212,0.4);
+    box-shadow:0 0 60px 10px rgba(57,245,212,0.12) inset;
+    animation:spin 26s linear infinite;
+  }
+  .about-portrait .ring::before{
+    content:''; position:absolute; top:-3px; left:calc(50% - 3px);
+    width:6px; height:6px; border-radius:50%; background:var(--neon);
+    box-shadow:0 0 12px 4px var(--glow-soft);
+  }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+
+  .fact-row{ display:flex; gap:16px; margin-top:30px; flex-wrap:wrap; }
+  .fact{
+    border:1px solid rgba(167,231,236,0.2); border-radius:12px; padding:16px 20px;
+    background:rgba(10,77,110,0.15); min-width:150px;
+  }
+  .fact .num{ font-family:'Chakra Petch',sans-serif; color:var(--neon-2); font-size:1.4rem; font-weight:600; }
+  .fact .label{ font-size:0.85rem; color:var(--foam-dim); margin-top:4px; }
+
+  /* education timeline */
+  .timeline{ position:relative; margin-top:10px; padding-left:32px; border-left:1px solid rgba(95,233,255,0.25); }
+  .t-item{ position:relative; padding-bottom:40px; }
+  .t-item:last-child{ padding-bottom:0; }
+  .t-item::before{
+    content:''; position:absolute; left:-38px; top:4px; width:12px; height:12px; border-radius:50%;
+    background:var(--abyss); border:2px solid var(--neon); box-shadow:0 0 14px 2px var(--glow-soft);
+  }
+  .t-item h3{ font-size:1.2rem; color:var(--foam); font-weight:600; }
+  .t-item p{ color:var(--foam-dim); margin-top:6px; line-height:1.7; }
+  .t-tag{
+    display:inline-block; margin-top:10px; font-size:0.8rem; color:var(--neon-2);
+    border:1px solid rgba(95,233,255,0.3); padding:4px 12px; border-radius:999px;
+  }
+
+  /* skills */
+  .skill-cloud{ display:flex; flex-wrap:wrap; gap:14px; margin-top:8px; }
+  .skill-pill{
+    padding:12px 22px; border-radius:999px; font-size:0.95rem;
+    border:1px solid rgba(95,233,255,0.28);
+    background:linear-gradient(180deg, rgba(15,122,158,0.18), rgba(4,40,63,0.4));
+    color:var(--foam);
+    transition:transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+  }
+  .skill-pill:hover{
+    transform:translateY(-4px);
+    border-color:var(--neon);
+    box-shadow:0 8px 24px -10px var(--glow-soft);
+    color:var(--neon-2);
+  }
+  .skill-cats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:36px; margin-top:40px; }
+  .skill-cat h4{ font-family:'Chakra Petch',sans-serif; color:var(--neon-2); font-size:1rem; margin-bottom:14px; font-weight:600;}
+
+  /* portfolio */
+  .work-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:28px; margin-top:44px; }
+  .work-card{
+    border-radius:16px; overflow:hidden; border:1px solid rgba(167,231,236,0.15);
+    background:rgba(6,45,68,0.35);
+    transition:transform .4s ease, border-color .4s ease, box-shadow .4s ease;
+  }
+  .work-card:hover{ transform:translateY(-6px); border-color:rgba(57,245,212,0.5); box-shadow:0 20px 40px -18px rgba(0,0,0,0.6); }
+  .work-thumb{
+    height:190px; position:relative; display:flex; align-items:center; justify-content:center;
+    font-family:'Chakra Petch',sans-serif; font-size:2.4rem; font-weight:700; color:rgba(255,255,255,0.85);
+  }
+  .work-thumb span{ position:relative; z-index:2; letter-spacing:0.04em; }
+  .work-thumb::after{
+    content:''; position:absolute; inset:0;
+    background:repeating-linear-gradient(115deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 26px);
+  }
+  .thumb-1{ background:linear-gradient(140deg,#0b7a9e,#0a2f47); }
+  .thumb-2{ background:linear-gradient(140deg,#1b9e8f,#083247); }
+  .thumb-3{ background:linear-gradient(140deg,#0e5f8e,#12241f); }
+  .thumb-4{ background:linear-gradient(140deg,#0a4d6e,#1c3a2e); }
+  .work-body{ padding:22px 22px 26px; }
+  .work-body .tag{ font-size:0.78rem; color:var(--neon); font-family:'Chakra Petch',sans-serif; }
+  .work-body h3{ font-size:1.15rem; margin-top:8px; color:var(--foam); font-weight:600; }
+  .work-body p{ margin-top:8px; color:var(--foam-dim); font-size:0.92rem; line-height:1.7; }
+
+  /* contact */
+  .contact-wrap{
+    border-radius:24px; padding:clamp(36px,6vw,72px);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(57,245,212,0.14), transparent 50%),
+      linear-gradient(160deg, rgba(10,77,110,0.35), rgba(4,23,37,0.6));
+    border:1px solid rgba(95,233,255,0.2);
+    text-align:center;
+  }
+  .contact-wrap h2{ font-size:clamp(1.8rem,4vw,2.6rem); color:var(--foam); font-weight:600; max-width:18ch; margin:0 auto 18px; }
+  .contact-wrap p{ color:var(--foam-dim); max-width:48ch; margin:0 auto; line-height:1.8; }
+  .contact-links{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:36px; }
+  .clink{
+    display:flex; align-items:center; gap:10px; padding:12px 22px; border-radius:999px;
+    border:1px solid rgba(167,231,236,0.25); font-size:0.92rem;
+    transition:all .3s ease;
+  }
+  .clink:hover{ border-color:var(--neon); background:rgba(57,245,212,0.08); transform:translateY(-3px); }
+  .clink svg{ width:16px; height:16px; }
+
+  footer{
+    text-align:center; padding:40px 20px 50px; color:rgba(169,212,222,0.5); font-size:0.85rem;
+  }
+
+  @media (max-width:820px){
+    .about-grid{ grid-template-columns:1fr; }
+    .nav-links{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="ocean-bg"></div>
+  <div class="ray"></div><div class="ray"></div><div class="ray"></div><div class="ray"></div><div class="ray"></div>
+  <canvas id="particles"></canvas>
+
+  <nav>
+    <div class="brand"><span class="brand-mark"></span>พัชรินทร์ เชิงชวน</div>
+    <div class="nav-links">
+      <a href="#about">เกี่ยวกับฉัน</a>
+      <a href="#education">การศึกษา</a>
+      <a href="#skills">ทักษะ</a>
+      <a href="#work">ผลงาน</a>
+      <a href="#contact">ติดต่อ</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow-thai">เกมและแอนิเมชัน · ผู้เล่าเรื่องผ่านโลกดิจิทัล</div>
+    <h1>พัชรินทร์ เชิงชวน</h1>
+    <p class="role">นักศึกษาสาขา<b>เกมและแอนิเมชัน</b> คณะสถาปัตยกรรมและการออกแบบ<br>มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์</p>
+    <div class="hero-cta">
+      <a href="#work" class="btn btn-primary">ดูผลงานของฉัน</a>
+      <a href="#contact" class="btn btn-ghost">ติดต่อฉัน</a>
+    </div>
+
+    <div class="wave-wrap">
+      <svg class="wave-back" viewBox="0 0 2400 300" preserveAspectRatio="none">
+        <path d="M0,150 C300,220 600,80 900,150 C1200,220 1500,80 1800,150 C2100,220 2300,120 2400,150 L2400,300 L0,300 Z" fill="#0a4d6e" opacity="0.55"></path>
+      </svg>
+      <svg class="wave-mid" viewBox="0 0 2400 300" preserveAspectRatio="none">
+        <path d="M0,180 C260,110 520,240 800,170 C1100,100 1400,230 1700,170 C2000,110 2200,190 2400,160 L2400,300 L0,300 Z" fill="#0f7a9e" opacity="0.55"></path>
+      </svg>
+      <svg class="wave-front" viewBox="0 0 2400 300" preserveAspectRatio="none">
+        <path d="M0,210 C320,150 600,260 900,200 C1250,130 1550,250 1900,190 C2150,150 2300,210 2400,190 L2400,300 L0,300 Z" fill="#062338"></path>
+        <path d="M0,210 C320,150 600,260 900,200 C1250,130 1550,250 1900,190 C2150,150 2300,210 2400,190" fill="none" stroke="#39f5d4" stroke-width="2" opacity="0.7"></path>
+      </svg>
+    </div>
+  </header>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-inner about-grid">
+      <div class="about-portrait"><div class="ring"></div></div>
+      <div>
+        <div class="kicker">เกี่ยวกับฉัน</div>
+        <h2 class="section-title">สร้างโลกเสมือนจากจินตนาการ ให้กลายเป็นภาพที่เคลื่อนไหวได้จริง</h2>
+        <p class="lede">
+          ฉันชื่อพัชรินทร์ เชิงชวน กำลังศึกษาในสาขาเกมและแอนิเมชัน คณะสถาปัตยกรรมและการออกแบบ
+          มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์ หลงใหลในการออกแบบตัวละคร การเล่าเรื่องผ่านภาพเคลื่อนไหว
+          และการสร้างบรรยากาศแฟนตาซีที่ทำให้ผู้เล่นและผู้ชมรู้สึกเหมือนได้หลุดเข้าไปอยู่ในอีกโลกหนึ่ง
+        </p>
+        <div class="fact-row">
+          <div class="fact"><div class="num">3+</div><div class="label">ปีที่ฝึกฝนงานออกแบบ</div></div>
+          <div class="fact"><div class="num">10+</div><div class="label">โปรเจกต์เกม/แอนิเมชัน</div></div>
+          <div class="fact"><div class="num">2D/3D</div><div class="label">ทักษะที่ถนัด</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <div class="section-inner">
+      <div class="kicker">การศึกษา</div>
+      <h2 class="section-title">เส้นทางการเรียนรู้</h2>
+      <div class="timeline">
+        <div class="t-item">
+          <h3>มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์</h3>
+          <p>คณะสถาปัตยกรรมและการออกแบบ สาขาเกมและแอนิเมชัน<br>ศึกษาแนวคิดการออกแบบเกม การสร้างแอนิเมชัน และการพัฒนาโลกเสมือนจริง</p>
+          <span class="t-tag">กำลังศึกษา</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-inner">
+      <div class="kicker">ทักษะความสามารถ</div>
+      <h2 class="section-title">เครื่องมือที่ใช้เนรมิตโลกแฟนตาซี</h2>
+      <p class="lede">ทักษะที่ฝึกฝนทั้งด้านการออกแบบเกม แอนิเมชัน และงานภาพ ตั้งแต่แนวคิดจนถึงชิ้นงานที่เคลื่อนไหวได้จริง</p>
+
+      <div class="skill-cats">
+        <div class="skill-cat">
+          <h4>ออกแบบเกม</h4>
+          <div class="skill-cloud">
+            <span class="skill-pill">Game Design</span>
+            <span class="skill-pill">Level Design</span>
+            <span class="skill-pill">Unity</span>
+            <span class="skill-pill">Character Concept</span>
+          </div>
+        </div>
+        <div class="skill-cat">
+          <h4>แอนิเมชันและภาพ</h4>
+          <div class="skill-cloud">
+            <span class="skill-pill">2D Animation</span>
+            <span class="skill-pill">3D Modeling</span>
+            <span class="skill-pill">Blender</span>
+            <span class="skill-pill">Adobe Photoshop</span>
+            <span class="skill-pill">Adobe After Effects</span>
+          </div>
+        </div>
+        <div class="skill-cat">
+          <h4>อื่น ๆ</h4>
+          <div class="skill-cloud">
+            <span class="skill-pill">Storytelling</span>
+            <span class="skill-pill">Storyboard</span>
+            <span class="skill-pill">Digital Painting</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work">
+    <div class="section-inner">
+      <div class="kicker">ผลงาน</div>
+      <h2 class="section-title">ผลงานคัดสรร</h2>
+      <p class="lede">ตัวอย่างผลงานบางส่วนจากการเรียนและโปรเจกต์ส่วนตัว — สามารถแทนที่ด้วยภาพผลงานจริงของคุณได้ภายหลัง</p>
+
+      <div class="work-grid">
+        <div class="work-card">
+          <div class="work-thumb thumb-1"><span>01</span></div>
+          <div class="work-body">
+            <div class="tag">GAME DESIGN</div>
+            <h3>Tidecaller — ผจญภัยใต้ทะเลลึก</h3>
+            <p>คอนเซ็ปต์เกมผจญภัยแฟนตาซี ผู้เล่นควบคุมพลังแห่งคลื่นเพื่อฝ่าด่านโลกใต้สมุทร</p>
+          </div>
+        </div>
+        <div class="work-card">
+          <div class="work-thumb thumb-2"><span>02</span></div>
+          <div class="work-body">
+            <div class="tag">CHARACTER DESIGN</div>
+            <h3>ออกแบบตัวละครวิญญาณแห่งสายน้ำ</h3>
+            <p>การออกแบบตัวละครที่ได้แรงบันดาลใจจากธรรมชาติและพลังงานเรืองแสงใต้ทะเล</p>
+          </div>
+        </div>
+        <div class="work-card">
+          <div class="work-thumb thumb-3"><span>03</span></div>
+          <div class="work-body">
+            <div class="tag">2D ANIMATION</div>
+            <h3>Short Loop — คลื่นแสงราตรี</h3>
+            <p>งานแอนิเมชันสั้นแสดงการเคลื่อนไหวของคลื่นและแสงเรืองในบรรยากาศยามค่ำคืน</p>
+          </div>
+        </div>
+        <div class="work-card">
+          <div class="work-thumb thumb-4"><span>04</span></div>
+          <div class="work-body">
+            <div class="tag">3D ENVIRONMENT</div>
+            <h3>ฉากป่าสาหร่ายเรืองแสง</h3>
+            <p>สภาพแวดล้อม 3 มิติสไตล์แฟนตาซี ออกแบบเพื่อใช้ในฉากสำรวจของเกม</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-inner contact-wrap">
+      <h2>มาร่วมสร้างโลกใบใหม่ไปด้วยกัน</h2>
+      <p>เปิดรับโอกาสฝึกงาน งานโปรเจกต์ และความร่วมมือด้านเกมและแอนิเมชัน ติดต่อได้ทุกช่องทางด้านล่าง</p>
+      <div class="contact-links">
+        <a class="clink" href="mailto:patcharin.example@email.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 4l8 8 8-8"/></svg>
+          patcharin.example@email.com
+        </a>
+        <a class="clink" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+          Instagram
+        </a>
+        <a class="clink" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          Facebook
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>© 2026 Patcharin Choengchuan · Game &amp; Animation Portfolio</footer>
+
+<script>
+  // Bioluminescent floating particles
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function makeParticles(){
+    const count = Math.min(70, Math.floor(w/22));
+    particles = Array.from({length: count}, () => ({
+      x: Math.random()*w,
+      y: Math.random()*h + h*0.2,
+      r: Math.random()*2 + 0.6,
+      speed: Math.random()*0.4 + 0.12,
+      drift: (Math.random()-0.5)*0.3,
+      alpha: Math.random()*0.5 + 0.2,
+      hue: Math.random() > 0.5 ? '57,245,212' : '95,233,255'
+    }));
+  }
+  makeParticles();
+  window.addEventListener('resize', makeParticles);
+
+  function tick(){
+    ctx.clearRect(0,0,w,h);
+    for(const p of particles){
+      p.y -= p.speed;
+      p.x += p.drift;
+      if(p.y < -10){ p.y = h + 10; p.x = Math.random()*w; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${p.hue},${p.alpha})`;
+      ctx.shadowColor = `rgba(${p.hue},0.9)`;
+      ctx.shadowBlur = 8;
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // respect reduced motion
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if(reduce.matches){
+    document.querySelectorAll('.wave-back,.wave-mid,.wave-front,.ring').forEach(el => el.style.animation = 'none');
+    cancelAnimationFrame(tick);
+  }
+</script>
+</body>
+</html>
