@@ -41,7 +41,7 @@
 
   <script>
     // ===== ตัวปรับโมเดล (แก้ตรงนี้ถ้าโมเดลเล็ก/ใหญ่/เลื่อนไม่พอดี) =====
-    const SIZE_MULTIPLIER = 0.8;  // ขนาดโมเดลเทียบกับความกว้างหน้า (เพิ่ม = ใหญ่ขึ้น, ลด = เล็กลง)
+    const SIZE_MULTIPLIER = 1.0;  // ขนาดโมเดลเทียบกับความกว้างหน้า (เพิ่ม = ใหญ่ขึ้น, ลด = เล็กลง)
     const OFFSET_Y = 0.0;         // เลื่อนขึ้นลง (หน่วยเป็นสัดส่วนของขนาดโมเดล, ค่าบวก = ขึ้น)
     const OFFSET_Z = 0.0;         // เลื่อนเข้าออก (ค่าบวก = ยื่นมาข้างหน้า, ค่าลบ = ถอยเข้าหาหัว)
     // ===========================================================
@@ -62,6 +62,12 @@
         const R = document.querySelector('#anchorR').object3D;
         L.getWorldPosition(this.a);
         R.getWorldPosition(this.b);
+        // แปลงเป็นหน่วยของ "จุดยึดแม่" (anchor 168) ซึ่งมีสเกลของใบหน้าอยู่แล้ว
+        // ไม่งั้นโมเดลจะถูกขยายซ้ำสองรอบจนใหญ่เต็มจอ
+        const parent = this.el.object3D.parent;
+        parent.updateWorldMatrix(true, false);
+        parent.worldToLocal(this.a);
+        parent.worldToLocal(this.b);
         const faceWidth = this.a.distanceTo(this.b);
         if (!(faceWidth > 0.0001)) return;
 
