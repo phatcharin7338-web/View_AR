@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Angry Face - Blendshape</title>
+  <script type="importmap">
+    { "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "mindar-face-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-three.prod.js"
+    } }
+  </script>
+  <style>
+    body { margin: 0; }
+    #container { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { MindARThree } from 'mindar-face-three';
+
+    // ===== ตัวปรับโมเดล (แก้ตรงนี้ถ้าโมเดลเล็ก/ใหญ่/เลื่อนไม่พอดี) =====
+    const SIZE_MULTIPLIER = 1.0;  // ขนาดโมเดลเทียบกับความกว้างหน้า (เพิ่ม = ใหญ่ขึ้น)
+    const OFFSET_Y = 0.0;         // เลื่อนขึ้นลง (ค่าบวก = ขึ้น)
+    const OFFSET_Z = 0.0;         // เลื่อนเข้าออก (ค่าบวก = ยื่นมาข้างหน้า)
+    // ===========================================================
+
+    // ตำแหน่งในโมเดลเอง: ตาอยู่สูงจากกึ่งกลางประมาณ +0.1 และหน้าอยู่ที่ z = +0.5
+    const MODEL_EYE_Y = 0.1;
+    const MODEL_FRONT_Z = 0.5;
+
+    const mindar = new MindARThree({ container: document.querySelector('#container') });
+    const { renderer, scene, camera } = mindar;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1));
+
+    // โหลดโมเดล angry.glb (วางไว้ที่โฟลเดอร์หลักของ repo)
+    const model = await new GLTFLoader().loadAsync('angry.glb');
+
+    // ยึดโมเดลไว้ที่จุดระหว่างตา (168) และใช้ขอบหน้าซ้าย-ขวา (234, 454) วัดขนาดหน้า
+    const eyeAnchor = mindar.addAnchor(168);
+    const leftAnchor = mindar.addAnchor(234);
+    const rightAnchor = mindar.addAnchor(454);
+
+    const pivot = new THREE.Group();
+    pivot.visible = false;           // ซ่อนไว้ก่อนจนกว่าจะวัดขนาดหน้าได้
+    pivot.add(model.scene);
+    eyeAnchor.group.add(pivot);
+
+    // รวบรวมเมชที่มี morph target (blendshape) ของโมเดล
+    const meshes = [];
+    model.scene.traverse(object => {
+      if (object.isMesh && object.morphTargetDictionary && object.morphTargetInfluences) meshes.push(object);
+    });
+
+    const pA = new THREE.Vector3();
+    const pB = new THREE.Vector3();
+    let size = 0;
+
+    function fitToFace() {
+      leftAnchor.group.getWorldPosition(pA);
+      rightAnchor.group.getWorldPosition(pB);
+      // แปลงเป็นหน่วยของจุดยึดแม่ (มีสเกลของใบหน้าอยู่แล้ว) จะได้ไม่ขยายซ้ำสองรอบ
+      eyeAnchor.group.updateWorldMatrix(true, false);
+      eyeAnchor.group.worldToLocal(pA);
+      eyeAnchor.group.worldToLocal(pB);
+      const faceWidth = pA.distanceTo(pB);
+      if (!(faceWidth > 1e-6)) return;
+
+      const target = faceWidth * SIZE_MULTIPLIER;
+      size = size ? size + (target - size) * 0.15 : target; // ทำให้ขนาดนิ่ง ไม่สั่น
+      pivot.scale.setScalar(size);
+      pivot.position.set(0, (OFFSET_Y - MODEL_EYE_Y) * size, (OFFSET_Z - MODEL_FRONT_Z) * size);
+      pivot.visible = true;
+    }
+
+    await mindar.start();
+
+    renderer.setAnimationLoop(() => {
+      fitToFace();
+
+      // จับคู่ชื่อ blendshape กับ morph target ของโมเดล เช่น jawOpen, eyeBlinkLeft
+      const categories = mindar.getLatestEstimate?.()?.blendshapes?.categories;
+      for (const mesh of meshes) {
+        for (const { categoryName, score } of categories ?? []) {
+          const index = mesh.morphTargetDictionary[categoryName];
+          if (index !== undefined) mesh.morphTargetInfluences[index] = score;
+        }
+      }
+      renderer.render(scene, camera);
+    });
+  </script>
+</body>
+</html>
